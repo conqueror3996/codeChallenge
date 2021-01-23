@@ -1,0 +1,24 @@
+{
+  "extends": ["airbnb", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": [
+      "off",
+      {
+        "semi": false,
+        "singleQuote": true,
+        "trailingComma": "es5",
+        "arrowParens": "always",
+        "bracketSpacing": true,
+        "printWidth": 80,
+        "endOfLine": "auto"
+      }
+    ],
+    "camelcase": "off",
+    "max-len": "off",
+    "no-underscore-dangle": "off",
+    "global-require": "off",
+    "max-classes-per-file": ["error", 2],
+    "no-bitwise": ["error", { "allow": ["|", "&"] }]
+  }
+}
