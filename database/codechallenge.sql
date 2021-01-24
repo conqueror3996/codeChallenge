@@ -69,6 +69,19 @@ ALTER SEQUENCE public.tbl_departments_department_id_seq OWNED BY public.tbl_depa
 
 
 --
+-- Name: tbl_emp_team; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tbl_emp_team (
+    employee_id text NOT NULL,
+    team_id integer NOT NULL,
+    role_id integer
+);
+
+
+ALTER TABLE public.tbl_emp_team OWNER TO postgres;
+
+--
 -- Name: tbl_employees; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -76,9 +89,7 @@ CREATE TABLE public.tbl_employees (
     employee_id text DEFAULT public.uuid_generate_v4() NOT NULL,
     employee_lastname text,
     employee_firstname text,
-    employee_status boolean DEFAULT false,
-    role_id integer DEFAULT 3,
-    team_id integer
+    employee_status boolean DEFAULT false
 );
 
 
@@ -177,19 +188,26 @@ COPY public.tbl_departments (department_id, department_name, department_status) 
 
 
 --
+-- Data for Name: tbl_emp_team; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tbl_emp_team (employee_id, team_id, role_id) FROM stdin;
+730e5867-10ff-45cd-9e67-aa6419240eb1	3	3
+b1a45495-9d14-4f08-bc15-fbdb3ce197e3	2	2
+c46a75a7-c794-4a17-b032-6d49db764e30	3	2
+721b48c1-eef8-4cf5-b7fd-2cda8b60d2d6	4	2
+\.
+
+
+--
 -- Data for Name: tbl_employees; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tbl_employees (employee_id, employee_lastname, employee_firstname, employee_status, role_id, team_id) FROM stdin;
-ea26055b-74a5-4b94-a858-29b90c19128e	Nguyen	Khang	f	1	\N
-9841049e-41a1-443b-be8b-6160df1ee730	Tran	A	f	2	1
-abb40bc6-ba29-43db-a424-1a8de5afce28	Dinh	B	f	3	1
-ceed9ccb-4ff1-4fe1-95f0-ddbfb56b46bd	Hoang	C	f	2	3
-d831c3ae-69de-477b-af4a-dca7e8d9d24b	Dinh	D	f	3	3
-9f802f0f-63d9-4ea2-8296-17af4d1f05ca	Dang	F	f	3	3
-062ba9ac-ac7f-47cc-a923-3f7d99058842	Nguyen	G	f	3	3
-cff0fabe-e228-4a35-8cb8-e2fc8363ebf0	Le	H	f	2	4
-3c31f318-5332-4bf4-82f3-34021622accb	Pham	IUpdate	t	3	5
+COPY public.tbl_employees (employee_id, employee_lastname, employee_firstname, employee_status) FROM stdin;
+b1a45495-9d14-4f08-bc15-fbdb3ce197e3	Test2	User2	f
+c46a75a7-c794-4a17-b032-6d49db764e30	Test3	User3	f
+730e5867-10ff-45cd-9e67-aa6419240eb1	Test1	User1	t
+721b48c1-eef8-4cf5-b7fd-2cda8b60d2d6	TestUpate	UserUpdate	t
 \.
 
 
@@ -210,11 +228,10 @@ COPY public.tbl_roles (role_id, role_name, role_status) FROM stdin;
 
 COPY public.tbl_teams (team_id, team_name, team_status, department_id) FROM stdin;
 1	Team 1	f	1
-3	Team 3	f	3
-5	Team 5	f	3
-2	Team 2	f	2
-6	Team 6	f	3
-4	Team 4	f	2
+2	Team 2	f	3
+3	Team 3	f	2
+4	Team 4	f	3
+5	Team 5	f	2
 \.
 
 
@@ -248,6 +265,14 @@ SELECT pg_catalog.setval('public.tbl_teams_team_id_seq', 6, true);
 
 ALTER TABLE ONLY public.tbl_departments
     ADD CONSTRAINT tbl_departments_pkey PRIMARY KEY (department_id);
+
+
+--
+-- Name: tbl_emp_team tbl_emp_team_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tbl_emp_team
+    ADD CONSTRAINT tbl_emp_team_pkey PRIMARY KEY (employee_id, team_id);
 
 
 --

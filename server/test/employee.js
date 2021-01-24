@@ -7,7 +7,6 @@ let chaiHttp = require('chai-http');
 let server = require('../index');
 let should = chai.should();
 const db = require('../services/db')
-const {environment, setEnv} = require('../environments/index')
 
 chai.use(chaiHttp);
 
@@ -23,22 +22,31 @@ describe('Employees', () => {
             await db.postgre.run(`TRUNCATE TABLE tbl_teams;`).catch((err) => err)
             await db.postgre.run(`TRUNCATE TABLE tbl_employees;`).catch((err) => err)
             await db.postgre.run(`TRUNCATE TABLE tbl_emp_team;`).catch((err) => err)
+            await db.postgre.run(`TRUNCATE TABLE tbl_users;`).catch((err) => err)
 
-            const queryInsert3 = `
+            const queryInsertDepartments = `
             INSERT INTO public.tbl_departments(department_id, department_name) VALUES (1, 'Department 1');
             INSERT INTO public.tbl_departments(department_id, department_name) VALUES (2, 'Department 2');
             INSERT INTO public.tbl_departments(department_id, department_name) VALUES (3, 'Department 3');`
-            await db.postgre.run(queryInsert3).catch((err) => err)
+            await db.postgre.run(queryInsertDepartments).catch((err) => err)
 
-            const queryInsert4 = `
+            const queryInsertTeams = `
             INSERT INTO public.tbl_teams(team_id, team_name, department_id)VALUES (1, 'Team 1', 1);
             INSERT INTO public.tbl_teams(team_id, team_name, department_id)VALUES (2, 'Team 2', 3);
             INSERT INTO public.tbl_teams(team_id, team_name, department_id)VALUES (3, 'Team 3', 2);
             INSERT INTO public.tbl_teams(team_id, team_name, department_id)VALUES (4, 'Team 4', 3);
             INSERT INTO public.tbl_teams(team_id, team_name, department_id)VALUES (5, 'Team 5', 2);`
-            await db.postgre.run(queryInsert4).catch((err) => err)
+            await db.postgre.run(queryInsertTeams).catch((err) => err)
 
-            const queryInsert1 = `
+            const queryInsertUsers = `
+            INSERT INTO public.tbl_users(user_username, user_password, user_salt, user_iteration, user_status, user_email, user_fullname, user_permission_code) 
+                VALUES ('admin', '1589534670162$10$77992cc653f8f6335e65e5c324d78cc3', '1589534670162', 10, false, 'admin@test.com', 'Admin', '99');
+                INSERT INTO public.tbl_users(user_username, user_password, user_salt, user_iteration, user_status, user_email, user_fullname, user_permission_code) 
+                VALUES ('test1', '1589534670162$10$77992cc653f8f6335e65e5c324d78cc3', '1589534670162', 10, false, 'testuser@test.com', 'TestUser', '11');
+            `
+            await db.postgre.run(queryInsertUsers).catch((err) => err)
+
+            const queryInsertEmployees = `
                 INSERT INTO tbl_employees ( employee_lastname, employee_firstname)
                 VALUES ('Test1', 'User1') 
                 RETURNING employee_id;
@@ -48,13 +56,13 @@ describe('Employees', () => {
                 INSERT INTO tbl_employees ( employee_lastname, employee_firstname)
                 VALUES ('Test3', 'User3')
                 RETURNING employee_id;`
-            const result = await db.postgre.run(queryInsert1).catch((err) => err)
+            const result = await db.postgre.run(queryInsertEmployees).catch((err) => err)
             if (result === null) {
                 done(new Error);
             }
 
             /** INSERT into tbl_emp_team */
-            const queryInsert2 = `
+            const queryInsertEmpTeam = `
                 INSERT INTO tbl_emp_team ( employee_id, team_id, role_id)
                 VALUES ('${result[0].rows[0].employee_id}', 3, 3) 
                 RETURNING employee_id;
@@ -64,19 +72,19 @@ describe('Employees', () => {
                 INSERT INTO tbl_emp_team ( employee_id, team_id, role_id)
                 VALUES ('${result[2].rows[0].employee_id}', 3, 2) 
                 RETURNING employee_id;`
-            const result2 = await db.postgre.run(queryInsert2).catch((err) => err)
+            const result2 = await db.postgre.run(queryInsertEmpTeam).catch((err) => err)
             if (result2 === null) {
                 done(new Error);
             }
             const { rows } = result2[0]
 
             /** Update tbl_employees */
-            const queryUpdate1 = `
+            const queryUpdateEmployees = `
                 UPDATE tbl_employees
                 SET   employee_status = true
                 WHERE employee_id = '${rows[0].employee_id}' AND employee_status = false
                 RETURNING employee_id;`
-            const result3 = await db.postgre.run(queryUpdate1).catch((err) => err)
+            const result3 = await db.postgre.run(queryUpdateEmployees).catch((err) => err)
             if (result3 === null) {
                 done(new Error);
             }
@@ -214,42 +222,6 @@ describe('Employees', () => {
                     done();
                 });
         });
-
-        // let clock;
-        // clock = sinon.useFakeTimers();
-        // clock.tick(1800001)
-        // it('it should FAIL to add an employee', (done) => {
-        //     let loginInfo = {
-        //         user_username: "test1",
-        //         user_password: "123456789"
-        //     }
-        //     chai.request(server)
-        //         .post('/api/authen/login')
-        //         .send(loginInfo)
-        //         .end((err, res) => {
-        //             res.should.have.status(200);
-        //             res.body.should.have.property('data')
-        //             res.body.data.should.have.property('token')
-        //             token = res.body.data.token
-        //             clock.restore();
-        //         });
-        //     let newEmployee = {
-        //         "employee_lastname": "Test",
-        //         "employee_firstname": "User",
-        //         "team_id": 4
-        //     }
-        //     chai.request(server)
-        //         .get('/api/employees/add-employees')
-        //         .set({ "Authorization": `${token}` })
-        //         .send(newEmployee)
-        //         .end((err, res) => {
-        //             res.should.have.status(200);
-        //             res.body.should.have.property('data')
-        //             res.body.data.should.be.a('array');
-        //             res.body.should.have.property('code').eql('000000000000')
-        //             done();
-        //         });
-        // });
     });
     /*
      * Test the /GET Employees Detail
@@ -283,22 +255,6 @@ describe('Employees', () => {
      * Test the PUT Update Logic Employee
      */
     describe('/PUT Update an Employee', () => {
-        it(`it should FAIL to UPDATE the employee because params 'employee_id' is missing`, (done) => {
-            let data = {
-                "employee_lastname": "TestUpate",
-                "employee_firstname": "UserUpdate",
-                "role_id": 2,
-                "team_id": 5
-            }
-            chai.request(server)
-                .put(`/api/employees/update-employees`)
-                .set({ "Authorization": `${token}` })
-                .send(data)
-                .end((err, res) => {
-                    res.should.have.status(404);
-                    done();
-                });
-        });
         let notExistsEmployeeID = 'd6076f8c-2088-47a3-a306'
         it(`it should FAIL to UPDATE the employee because this employee_id doesn't exists`, (done) => {
             let data = {
@@ -398,15 +354,6 @@ describe('Employees', () => {
      * Test the PUT Delete Logic Employee
      */
     describe('/PUT Delete logic an Employee', () => {
-        it(`it should FAIL to DELETE the employee because params 'employee_id' is missing`, (done) => {
-            chai.request(server)
-                .put(`/api/employees/delete-employees`)
-                .set({ "Authorization": `${token}` })
-                .end((err, res) => {
-                    res.should.have.status(404);
-                    done();
-                });
-        });
         let notExistsEmployeeID = 'd6076f8c-2088-47a3-a306'
         it(`it should FAIL to DELETE the employee because this employee_id doesn't exists`, (done) => {
             chai.request(server)
@@ -439,6 +386,44 @@ describe('Employees', () => {
                     res.body.should.have.property('data')
                     res.body.should.have.property('code').eql('000000000000')
                     newEmployeeID = res.body.data.employee_id
+                    done();
+                });
+        });
+    });
+    /*
+     * Test the /POST Add an employee
+     */
+    describe('/POST add an employee', () => {
+        let newToken 
+        it('it should Login with normal user', (done) => {
+            let loginInfo2 = {
+                user_username: "test1",
+                user_password: "123456789"
+            }
+            chai.request(server)
+                .post('/api/authen/login')
+                .send(loginInfo2)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property('data')
+                    res.body.data.should.have.property('token')
+                    newToken = res.body.data.token
+                    done();
+                });
+        });
+        it('it should FAIL to add the employee', (done) => {
+            let newEmployee2 = {
+                "employee_lastname": "Test",
+                "employee_firstname": "User",
+                "team_id": 1
+            }
+            chai.request(server)
+                .post('/api/employees/add-employees')
+                .set({ "Authorization": `${newToken}` })
+                .send(newEmployee2)
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.have.property('code').eql('010000401105')
                     done();
                 });
         });
