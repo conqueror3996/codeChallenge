@@ -181,9 +181,6 @@ ALTER TABLE ONLY public.tbl_teams ALTER COLUMN team_id SET DEFAULT nextval('publ
 --
 
 COPY public.tbl_departments (department_id, department_name, department_status) FROM stdin;
-1	Department 1	f
-2	Department 2	f
-3	Department 3	f
 \.
 
 
@@ -192,10 +189,10 @@ COPY public.tbl_departments (department_id, department_name, department_status) 
 --
 
 COPY public.tbl_emp_team (employee_id, team_id, role_id) FROM stdin;
-730e5867-10ff-45cd-9e67-aa6419240eb1	3	3
-b1a45495-9d14-4f08-bc15-fbdb3ce197e3	2	2
-c46a75a7-c794-4a17-b032-6d49db764e30	3	2
-721b48c1-eef8-4cf5-b7fd-2cda8b60d2d6	4	2
+367c2e81-c944-4801-918c-398362a12343	3	3
+7e18f31f-32f1-41ca-b294-d94a173cbbc2	2	2
+c699418d-fc13-4644-a8ce-77fb7b8d8323	3	2
+f38c9b69-9d61-4625-a513-530e4e492e00	4	2
 \.
 
 
@@ -204,10 +201,6 @@ c46a75a7-c794-4a17-b032-6d49db764e30	3	2
 --
 
 COPY public.tbl_employees (employee_id, employee_lastname, employee_firstname, employee_status) FROM stdin;
-b1a45495-9d14-4f08-bc15-fbdb3ce197e3	Test2	User2	f
-c46a75a7-c794-4a17-b032-6d49db764e30	Test3	User3	f
-730e5867-10ff-45cd-9e67-aa6419240eb1	Test1	User1	t
-721b48c1-eef8-4cf5-b7fd-2cda8b60d2d6	TestUpate	UserUpdate	t
 \.
 
 
@@ -216,9 +209,6 @@ c46a75a7-c794-4a17-b032-6d49db764e30	Test3	User3	f
 --
 
 COPY public.tbl_roles (role_id, role_name, role_status) FROM stdin;
-1	President	f
-2	Manager	f
-3	Member	f
 \.
 
 
@@ -227,11 +217,6 @@ COPY public.tbl_roles (role_id, role_name, role_status) FROM stdin;
 --
 
 COPY public.tbl_teams (team_id, team_name, team_status, department_id) FROM stdin;
-1	Team 1	f	1
-2	Team 2	f	3
-3	Team 3	f	2
-4	Team 4	f	3
-5	Team 5	f	2
 \.
 
 
@@ -240,8 +225,6 @@ COPY public.tbl_teams (team_id, team_name, team_status, department_id) FROM stdi
 --
 
 COPY public.tbl_users (user_id, user_username, user_password, user_salt, user_iteration, user_status, user_email, user_fullname, user_permission_code) FROM stdin;
-7d61a4a1-3826-4fd9-b5d6-8b84433abd46	admin	1589534670162$10$77992cc653f8f6335e65e5c324d78cc3	1589534670162	10	f	testadmin@test.com	Manh Khang	99
-1f77a4a1-3826-4fd9-b5d1-8b82533abd50	test1	1589534670162$10$77992cc653f8f6335e65e5c324d78cc3	1589534670162	10	f	testuser@test.com	Test 1	11
 \.
 
 
