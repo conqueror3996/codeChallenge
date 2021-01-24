@@ -23,6 +23,7 @@ describe('Employees', () => {
             await db.postgre.run(`TRUNCATE TABLE tbl_employees;`).catch((err) => err)
             await db.postgre.run(`TRUNCATE TABLE tbl_emp_team;`).catch((err) => err)
             await db.postgre.run(`TRUNCATE TABLE tbl_users;`).catch((err) => err)
+            await db.postgre.run(`TRUNCATE TABLE tbl_roles;`).catch((err) => err)
 
             const queryInsertDepartments = `
             INSERT INTO public.tbl_departments(department_id, department_name) VALUES (1, 'Department 1');
@@ -37,6 +38,13 @@ describe('Employees', () => {
             INSERT INTO public.tbl_teams(team_id, team_name, department_id)VALUES (4, 'Team 4', 3);
             INSERT INTO public.tbl_teams(team_id, team_name, department_id)VALUES (5, 'Team 5', 2);`
             await db.postgre.run(queryInsertTeams).catch((err) => err)
+
+            const queryInsertRoles = `
+            INSERT INTO public.tbl_roles(role_id, role_name, role_status) VALUES (1, 'President', false);
+            INSERT INTO public.tbl_roles(role_id, role_name, role_status) VALUES (2, 'Leader', false);
+            INSERT INTO public.tbl_roles(role_id, role_name, role_status) VALUES (3, 'Member', false);
+            `
+            await db.postgre.run(queryInsertRoles).catch((err) => err)
 
             const queryInsertUsers = `
             INSERT INTO public.tbl_users(user_username, user_password, user_salt, user_iteration, user_status, user_email, user_fullname, user_permission_code) 
@@ -185,7 +193,7 @@ describe('Employees', () => {
             chai.request(server)
                 .get('/api/employees/get-employees')
                 .set({ 'Authorization': `${token}` })
-                .query({keyWords: 'Man'})
+                .query({keyWords: 'Le'})
                 .end((err, res) => {
                     if (err) { return done(err) }
                     res.should.have.status(200);
@@ -193,7 +201,7 @@ describe('Employees', () => {
                     res.body.data.should.be.a('array');
                     res.body.should.have.property('code').eql('000000000000')
                     const {data} = res.body
-                    const find = data.find((e) => e.role_name === 'Manager')
+                    const find = data.find((e) => e.role_name === 'Leader')
                     expect(find).not.eql(undefined)
                     done();
                 });
